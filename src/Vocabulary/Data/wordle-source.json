@@ -1,0 +1,16 @@
+{
+  "source": "https://github.com/skywind3000/ECDICT",
+  "commit": "39cfb9672c0906b63569e0453c2e6abfb9ab182a",
+  "source_sha256": "d1ecbdf9ee2b920afb6f430ca6b6bb9f559588cf0dff86e04bd255f9390843cc",
+  "cet4": 3849,
+  "cet6_including_cet4": 5805,
+  "counts": {
+    "4": 2754,
+    "5": 4173,
+    "6": 5874,
+    "7": 6848
+  },
+  "total": 19649,
+  "rule": "lowercase ASCII 4-7 letters; exam tag (zk,gk,cet4,cet6,ky,ielts,toefl,gre) or positive frq/bnc/collins; union all eligible CET answers",
+  "sha256": "15bbc235c25a5e596dfab809c61e47efdc4035f20f8a632ccb7da045598db931"
+}

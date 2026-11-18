@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.22000.0</TargetPlatformMinVersion>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SelfContained>true</SelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Vocabulary.ico</ApplicationIcon>
+    <ApplicationDefaultLanguage>zh-CN</ApplicationDefaultLanguage>
+    <AssemblyName>Vocabulary</AssemblyName>
+    <Version>2.2.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.6.5" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.6.5" />
+    <ProjectReference Include="../Vocabulary.Core/Vocabulary.Core.csproj"/>
+    <Content Include="Data\**;Assets\Vocabulary.ico" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
+  <Target Name="PublishXamlAssets" AfterTargets="Publish">
+    <ItemGroup><VocabularyXaml Include="$(TargetDir)*.xbf;$(TargetDir)$(AssemblyName).pri"/></ItemGroup>
+    <Copy SourceFiles="@(VocabularyXaml)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true"/>
+  </Target>
+</Project>

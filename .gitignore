@@ -1,0 +1,13 @@
+bin/
+obj/
+.cache/
+artifacts/
+*.user
+
+.vs/
+__pycache__/
+*.pyc
+study.db
+study.db-*
+study.db.*.bak
+last-error.txt

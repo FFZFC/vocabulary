@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Vocabulary.Core/Vocabulary.Core.csproj" />
+  <Project Path="src/Vocabulary/Vocabulary.csproj" />
+  <Project Path="tests/Vocabulary.Checks/Vocabulary.Checks.csproj" />
+</Solution>
