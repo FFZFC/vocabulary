@@ -1,5 +1,5 @@
 ﻿# Run with Windows PowerShell in an interactive session. Only targets the test instance.
-param([string]$AppExe = 'artifacts\Vocabulary-win-x64\Vocabulary.exe',[switch]$SystemChecks,[switch]$GoalOnly,[switch]$NotebookOnly,[switch]$ChallengeOnly)
+param([string]$AppExe = 'artifacts\LexiPane-v2.3.0-windows-x64-portable\LexiPane.exe',[switch]$SystemChecks,[switch]$GoalOnly,[switch]$NotebookOnly,[switch]$ChallengeOnly)
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes, System.Drawing, System.Windows.Forms
 Add-Type @'
@@ -97,7 +97,7 @@ try {
         if($LASTEXITCODE){throw 'Could not create isolated test history'}
     }
     $proc=Start-Process -FilePath $exe -PassThru
-    $main=Window '四六级单词'
+    $main=Window 'LexiPane'
     if($GoalOnly){
         $root=[System.Windows.Automation.AutomationElement]::FromHandle($main)
         $edits=New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::ControlTypeProperty,[System.Windows.Automation.ControlType]::Edit)
@@ -106,7 +106,7 @@ try {
         $edit.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).SetValue('1')
     }
     Click $main '开始使用'
-    $widget=Window '四六级单词 · 桌面卡片'
+    $widget=Window 'LexiPane · 桌面卡片'
     $owner=Await {[DesktopCheck]::GetWindow($widget,4)} "desktop attachment"
     Assert ($owner -ne [IntPtr]::Zero) 'desktop owner'
     if($ChallengeOnly){
@@ -157,7 +157,7 @@ try {
         Stop-Process -Id $proc.Id
         $proc.WaitForExit()
         $proc=Start-Process -FilePath $exe -PassThru
-        $main=Window '四六级单词'
+        $main=Window 'LexiPane'
         Click $main '生词本'
         [void](Await {FindItem $main '已收藏 2 词'} 'bookmarks persisted')
         Click $main "查看词条 $word"
@@ -197,7 +197,7 @@ try {
         Stop-Process -Id $proc.Id
         $proc.WaitForExit()
         $proc=Start-Process -FilePath $exe -PassThru
-        $main=Window '四六级单词'
+        $main=Window 'LexiPane'
         [void](Await {FindItem $main '3 / 1'} 'restart retains actual progress and goal')
         Click $main '开始学习'
         Click $main '记得'
@@ -230,7 +230,7 @@ try {
             $newPid=0
             [void][DesktopCheck]::GetWindowThreadProcessId($newShell,[ref]$newPid)
             Assert ($newPid -ne $shellProcess) 'real Explorer restart'
-            $widget=Window '四六级单词 · 桌面卡片'
+            $widget=Window 'LexiPane · 桌面卡片'
             [void](Await {
                 $actual=[DesktopCheck]::GetWindow($widget,4)
                 $ownerPid=0
@@ -255,10 +255,19 @@ try {
     Assert $true 'English and Chinese dictionary search'
     Click $main '今日学习'
     Click $main '开始学习'
-    $button=FindItem $main '记得'
-    $button.SetFocus()
     [void][DesktopCheck]::SetForegroundWindow($main)
-    Assert ([DesktopCheck]::GetForegroundWindow() -eq $main) 'keyboard target'
+    if ([DesktopCheck]::GetForegroundWindow() -ne $main) {
+        $caption = New-Object DesktopCheck+Rect
+        [void][DesktopCheck]::GetWindowRect($main,[ref]$caption)
+        $point = New-Object DesktopCheck+Pt ([int](($caption.l+$caption.r)/2)),($caption.t+20)
+        if ([DesktopCheck]::GetAncestor([DesktopCheck]::WindowFromPoint($point),2) -eq $main) {
+            [void][DesktopCheck]::SetCursorPos($point.x,$point.y)
+            [DesktopCheck]::mouse_event(2,0,0,0,[UIntPtr]::Zero)
+            [DesktopCheck]::mouse_event(4,0,0,0,[UIntPtr]::Zero)
+        }
+    }
+    [void](Await {[DesktopCheck]::GetForegroundWindow() -eq $main} 'keyboard target')
+    (FindItem $main '记得').SetFocus()
     [Windows.Forms.SendKeys]::SendWait(' ')
     [void](Await {FindItem $widget '仅查看'} 'space peeks')
     [Windows.Forms.SendKeys]::SendWait(' ')
@@ -367,7 +376,7 @@ try {
     [DesktopCheck]::mouse_event(4,0,0,0,[UIntPtr]::Zero)
     Assert ($proc.WaitForExit(6000)) 'tray exit'
     $proc=Start-Process -FilePath $exe -PassThru
-    $main=Window '四六级单词'
+    $main=Window 'LexiPane'
     [void](Await {FindItem $main '开始学习'} 'reopen')
     Assert (!(FindItem $main '开始使用')) 'onboarding persisted'
     Write-Output "QA artifacts: $qa"

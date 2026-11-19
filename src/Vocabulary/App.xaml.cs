@@ -61,7 +61,7 @@ public partial class App : Application
         }
         catch (Exception e)
         {
-            Native.MessageBox(0, e.Message, "四六级单词 · 无法启动", 0x10);
+            Native.MessageBox(0, e.Message, "LexiPane · 无法启动", 0x10);
             Exit();
         }
     }

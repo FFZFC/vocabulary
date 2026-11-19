@@ -11,3 +11,9 @@ study.db
 study.db-*
 study.db.*.bak
 last-error.txt
+*.msix
+*.msixbundle
+*.msixupload
+*.pfx
+*.p12
+*.snk

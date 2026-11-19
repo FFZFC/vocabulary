@@ -1,0 +1,32 @@
+name: Build LexiPane for Windows
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Run automated checks
+        shell: pwsh
+        run: |
+          dotnet run --project tests/Vocabulary.Checks -- src/Vocabulary/Data/lexicon.db
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Build portable ZIP
+        shell: pwsh
+        run: ./tools/publish.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LexiPane-windows-x64
+          path: artifacts/LexiPane-*-portable.zip
+          if-no-files-found: error

@@ -150,7 +150,7 @@ internal sealed class Tray : IDisposable
             Flags = 7,
             Callback = Callback,
             Icon = Native.LoadImage(0, App.IconPath, 1, 32, 32, 0x10),
-            Tip = "四六级单词",
+            Tip = "LexiPane",
             Info = "",
             InfoTitle = ""
         };

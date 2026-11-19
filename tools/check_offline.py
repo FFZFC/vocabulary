@@ -6,9 +6,9 @@ import argparse, os, subprocess, sqlite3, uuid, zipfile
 
 root=Path.cwd()
 parser=argparse.ArgumentParser()
-parser.add_argument('--release',default='artifacts/Vocabulary-2.2.0-win-x64.zip')
+parser.add_argument('--release',default='artifacts/LexiPane-v2.3.0-windows-x64-portable.zip')
 args=parser.parse_args()
-binary=(root/('.cache/offline-'+uuid.uuid4().hex)/'Vocabulary.exe').resolve()
+binary=(root/('.cache/offline-'+uuid.uuid4().hex)/'LexiPane.exe').resolve()
 assert binary.is_relative_to(root/".cache")
 with zipfile.ZipFile(root/args.release) as release:
     release.extractall(binary.parent)

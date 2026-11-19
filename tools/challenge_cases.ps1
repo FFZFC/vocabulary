@@ -122,7 +122,7 @@ Snap $main 'challenge-statistics.png'
 Stop-Process -Id $proc.Id
 $proc.WaitForExit()
 $proc=Start-Process -FilePath $exe -PassThru
-$main=Window '四六级单词'
+$main=Window 'LexiPane'
 Click $main '挑战'
 Click $main 'Wordle 猜词'
 Assert (!(FindId $main 'ChallengeInput')) 'restart discards unfinished round'

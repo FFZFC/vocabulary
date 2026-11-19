@@ -349,5 +349,10 @@ public sealed partial class MainWindow : Window
         var cet6 = app.Store.Summary(p with { Book = Book.Cet6 }, DateTimeOffset.Now);
         info.Children.Add(UI.Secondary($"ECDICT　·　四级 {cet4.Total:N0} 词　·　六级含四级基础 {cet6.Total:N0} 词"));
         Body.Children.Add(UI.Panel(info));
+        var about = UI.Column(5);
+        about.Children.Add(UI.Text("关于 LexiPane", 16, true));
+        var version = typeof(App).Assembly.GetName().Version!;
+        about.Children.Add(UI.Secondary($"{version.ToString(3)} · Windows 原生离线词汇学习"));
+        Body.Children.Add(UI.Panel(about));
     }
 }

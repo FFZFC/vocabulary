@@ -22,7 +22,7 @@ internal sealed class WidgetWindow : Window
     public WidgetWindow(App app)
     {
         this.app = app;
-        Title = "四六级单词 · 桌面卡片";
+        Title = "LexiPane · 桌面卡片";
         glass.Density = app.GlassDensity;
         DispatcherQueue.EnsureSystemDispatcherQueue();
         AppWindow.SetIcon(App.IconPath);
