@@ -8,7 +8,28 @@ namespace Vocabulary;
 public partial class App : Application
 {
     internal static string IconPath => Path.Combine(AppContext.BaseDirectory, "Assets", "Vocabulary.ico");
-    internal static string DataRoot => Environment.GetEnvironmentVariable("VOCABULARY_TEST_DATA") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Vocabulary");
+    internal static string PortableDataRoot => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Vocabulary");
+    private static readonly Lazy<string?> PackageFamily = new(GetPackageFamily);
+    internal static bool IsPackaged => PackageFamily.Value is not null;
+    internal static string DataRoot => Environment.GetEnvironmentVariable("VOCABULARY_TEST_DATA")
+        ?? (IsPackaged ? Windows.Storage.ApplicationData.Current.LocalFolder.Path : PortableDataRoot);
+
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, ExactSpelling = true)]
+    private static extern int GetCurrentPackageFamilyName(ref uint length, System.Text.StringBuilder? name);
+
+    private static string? GetPackageFamily()
+    {
+        const int noPackage = 15700;
+        const int insufficientBuffer = 122;
+        uint length = 0;
+        int result = GetCurrentPackageFamilyName(ref length, null);
+        if (result == noPackage) return null;
+        if (result != insufficientBuffer) throw new System.ComponentModel.Win32Exception(result);
+        var name = new System.Text.StringBuilder((int)length);
+        result = GetCurrentPackageFamilyName(ref length, name);
+        if (result != 0) throw new System.ComponentModel.Win32Exception(result);
+        return name.ToString();
+    }
     internal StudyStore Store { get; private set; } = null!;
     internal StudySession Session { get; private set; } = null!;
     internal Dictionary<ChallengeKind, ChallengeRound> Challenges { get; } = [];
@@ -46,7 +67,7 @@ public partial class App : Application
         {
             string suffix = Environment.GetEnvironmentVariable("VOCABULARY_TEST_DATA") is { } testPath
                 ? "." + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(testPath)))[..16]
-                : "";
+                : PackageFamily.Value is { } family ? "." + family : "";
             activation = new(false, EventResetMode.AutoReset, @"Local\Vocabulary.Activate.1" + suffix);
             single = new(false, @"Local\Vocabulary.Instance.1" + suffix, out bool first);
             if (!first) { activation.Set(); Exit(); return; }
@@ -136,12 +157,12 @@ public partial class App : Application
         if (p.WidgetVisible) widget?.AppWindow.Hide(); else RecoverDesktop();
         Main.UpdateToggle();
     }
-    internal void Quit()
+    internal void Quit(bool saveWidgetBounds = true)
     {
         if (Exiting) return;
         Exiting = true;
         timer?.Stop();
-        widget?.SaveBounds();
+        if (saveWidgetBounds) widget?.SaveBounds();
         wait?.Unregister(null);
         tray?.Dispose();
         widget?.Close();

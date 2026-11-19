@@ -1,5 +1,5 @@
 ﻿# Run with Windows PowerShell in an interactive session. Only targets the test instance.
-param([string]$AppExe = 'artifacts\LexiPane-v2.3.0-windows-x64-portable\LexiPane.exe',[switch]$SystemChecks,[switch]$GoalOnly,[switch]$NotebookOnly,[switch]$ChallengeOnly)
+param([string]$AppExe = 'artifacts\LexiPane-v2.3.1-windows-x64-portable\LexiPane.exe',[switch]$SystemChecks,[switch]$GoalOnly,[switch]$NotebookOnly,[switch]$ChallengeOnly)
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes, System.Drawing, System.Windows.Forms
 Add-Type @'

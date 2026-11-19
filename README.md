@@ -1,16 +1,17 @@
-# LexiPane 2.3.0
+# LexiPane 2.3.1
 
-LexiPane 是一款 Windows 原生离线词汇学习应用，支持 Windows 11 x64 21H2（22000）及更新版本。解压整个 `LexiPane-v2.3.0-windows-x64-portable.zip`，双击文件夹中的 **LexiPane.exe**。词库、.NET 和 WinUI 运行时随程序提供。
+LexiPane 是一款 Windows 原生离线词汇学习应用，支持 Windows 11 x64 21H2（22000）及更新版本。解压整个 `LexiPane-v2.3.1-windows-x64-portable.zip`，双击文件夹中的 **LexiPane.exe**。词库、.NET 和 WinUI 运行时随程序提供。
 
 ## 下载
 
-[下载 Windows 11 x64 免安装版](https://github.com/FFZFC/vocabulary/releases/download/v2.3.0/LexiPane-v2.3.0-windows-x64-portable.zip) · [版本说明与源码](https://github.com/FFZFC/vocabulary/releases/tag/v2.3.0)
+[下载 Windows 11 x64 免安装版](https://github.com/FFZFC/vocabulary/releases/download/v2.3.1/LexiPane-v2.3.1-windows-x64-portable.zip) · [版本说明与源码](https://github.com/FFZFC/vocabulary/releases/tag/v2.3.1)
 
 ## 功能
 
 - 透明桌面单词卡与主窗口同步，支持托盘、撤销、生词本和笔记。
 - 内置四六级词库，提供到期复习、每日目标提示和学习统计。
 - 中文默写、4—7 字母 Wordle、字母拼词与中英配对，支持错词重练和挑战成绩。
+- 在「设置 → 学习数据」导入和导出备份，可在升级或换电脑时恢复学习记录。
 - 离线使用，跟随 Windows 系统主题与高对比度设置。
 
 ## 界面预览
@@ -74,7 +75,9 @@ Wordle 猜测词典包含 **19,649** 个词，4／5／6／7 字母分别为 2,75
 
 四级收录 **3,849** 词，六级收录 **5,805** 词（包含四级基础）。按 ECDICT 的 cet4、cet6 整词标签筛选，并按规范化拼写去重。数据固定在提交 `39cfb9672c0906b63569e0453c2e6abfb9ab182a`。收录量指本软件内置词书的实际词条数。词频优先取 frq，其次取 bnc，缺失词频排在末尾。来源、校验值和许可位于发布包的 `Data` 目录。[ECDICT 项目](https://github.com/skywind3000/ECDICT/tree/39cfb9672c0906b63569e0453c2e6abfb9ab182a)
 
-学习进度、笔记、收藏、挑战成绩、设置和卡片位置保存在 `%LocalAppData%\Vocabulary\study.db`。备份时从托盘退出，再复制该目录。更新时先从旧版托盘菜单退出，再将新版完整解压到另一个文件夹并运行。LexiPane 沿用原有存档目录。早于 2.2 的存档会按现有迁移机制备份并升级。
+便携版的学习进度、笔记、收藏、挑战成绩、设置和卡片位置保存在 `%LocalAppData%\Vocabulary\study.db`。升级便携版时，先从旧版托盘菜单退出，再将新版完整解压到另一个文件夹并运行。新版会继续读取该存档。早于 2.2 的存档会按现有迁移机制备份并升级。
+
+2.3.1 可在「设置 → 学习数据」导出 `.lexipane` 备份，也可导入该备份或旧版 `study.db`。导入会替换当前存档，程序会先自动备份原有数据。导入成功后重新打开 LexiPane 即可继续学习。
 
 ## 从源码构建
 
@@ -85,7 +88,7 @@ dotnet run --project tests/Vocabulary.Checks -- src/Vocabulary/Data/lexicon.db
 powershell -ExecutionPolicy Bypass -File tools/publish.ps1
 ```
 
-上述命令生成 `artifacts/LexiPane-v2.3.0-windows-x64-portable.zip`。使用 WinUI 3、Windows App SDK 2.6.5、.NET 10 及 Windows 内置 SQLite 引擎。学习逻辑和数据访问位于 Vocabulary.Core，WinUI 界面及桌面集成位于 Vocabulary。评分日志和词条进度在同一笔事务中提交，每张卡片有独立提交标识。复习间隔和难度系数依据 [SM-2](https://www.super-memory.com/english/ol/sm2.htm)。
+上述命令生成 `artifacts/LexiPane-v2.3.1-windows-x64-portable.zip`。使用 WinUI 3、Windows App SDK 2.6.5、.NET 10 及 Windows 内置 SQLite 引擎。学习逻辑和数据访问位于 Vocabulary.Core，WinUI 界面及桌面集成位于 Vocabulary。评分日志和词条进度在同一笔事务中提交，每张卡片有独立提交标识。复习间隔和难度系数依据 [SM-2](https://www.super-memory.com/english/ol/sm2.htm)。
 
 需要重新生成词库时运行 `python tools/build_lexicon.py`。脚本校验固定源文件的 SHA-256 后生成 SQLite 词库。图标原图生成脚本为 `tools/make_icon.py`，需要 Pillow。
 
@@ -94,18 +97,18 @@ powershell -ExecutionPolicy Bypass -File tools/publish.ps1
 `tools/desktop_check.ps1` 通过 Windows UI Automation 和 Win32 操作实际发布包。它使用独立的模拟学习记录，验证统计图、遗忘词、撤销和背景透光，也覆盖首次启动、双语搜索、跨窗口评分、单实例、Win+D、拖动、托盘和重新启动。请在项目根目录启动 Windows PowerShell 运行：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools/desktop_check.ps1 -AppExe artifacts/LexiPane-v2.3.0-windows-x64-portable/LexiPane.exe
+powershell -ExecutionPolicy Bypass -File tools/desktop_check.ps1 -AppExe artifacts/LexiPane-v2.3.1-windows-x64-portable/LexiPane.exe
 ```
 
-专项验收可在脚本参数中指定 `-AppExe artifacts/LexiPane-v2.3.0-windows-x64-portable/LexiPane.exe`。加 `-GoalOnly` 可检查目标为 1 时持续切词、超额进度、同步撤销和重启。加 `-NotebookOnly` 可检查两窗收藏、编辑与搜索笔记、词条记录、生词本练习和重启后的保存结果。两个模式都使用独立空白存档。
+给上面的命令加 `-GoalOnly` 可检查目标为 1 时持续切词、超额进度、同步撤销和重启。加 `-NotebookOnly` 可检查两窗收藏、编辑与搜索笔记、词条记录、生词本练习和重启后的保存结果。两个模式都使用独立空白存档。
 
 `-SystemChecks` 会临时变更当前显示器缩放、明暗主题和高对比度，再重启 Explorer，适合在专门的交互测试时段运行。桌面验收需要 Python、Pillow 和 pywin32。测试期间自动记录并恢复显示设置。测试入口 `VOCABULARY_TEST_DATA` 用于隔离测试存档和应用实例。
 
-2.3.0 的 98 项核心检查已通过。从新目录解压的便携版已实测桌面卡片拖动、透明、Win+D、应用覆盖、托盘、Explorer 重启恢复、四种挑战、断网运行和重启后保存。明暗主题、高对比度及 125%／150%／200% 缩放已通过，测试后已恢复原设置。截图来自实际发布程序。
+2.3.1 的 106 项核心检查已通过，包含旧存档导入、导入前自动备份及失败回滚。桌面卡片、四种挑战、显示设置和断网运行的完整桌面验收在 2.3.0 完成。截图来自实际发布程序。
 
 运行 `python tools/check_offline.py` 可在无网络能力的临时 Windows AppContainer 中验证首次启动、查词和学习进度。该脚本从发布 ZIP 提取独立的测试副本，并在结束后清理临时身份。
 
-挑战专项验收使用独立的旧版测试存档，运行 `powershell -ExecutionPolicy Bypass -File tools/desktop_check.ps1 -AppExe artifacts/LexiPane-v2.3.0-windows-x64-portable/LexiPane.exe -ChallengeOnly`。
+挑战专项验收使用独立的旧版测试存档，给上面的桌面验收命令加 `-ChallengeOnly`。
 
 挑战专项模式配合 `-SystemChecks` 时，会临时切换主题、高对比度和缩放，并自动恢复原设置。
 

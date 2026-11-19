@@ -244,5 +244,6 @@ using (var journal = new StudyStore(legacyRoot, dict))
     Check(journal.GetEntry("abandon") == new NotebookEntry(true, "") && journal.GetWordHistory("abandon").Attempts == 7, "clearing note preserves bookmark and scores");
 }
 ChallengeChecks.Run(dict, scratch, Check);
+BackupChecks.Run(dict, scratch, Check);
 Console.WriteLine($"{checks} checks passed.");
 Directory.Delete(scratch, true);

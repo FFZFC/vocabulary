@@ -349,10 +349,69 @@ public sealed partial class MainWindow : Window
         var cet6 = app.Store.Summary(p with { Book = Book.Cet6 }, DateTimeOffset.Now);
         info.Children.Add(UI.Secondary($"ECDICT　·　四级 {cet4.Total:N0} 词　·　六级含四级基础 {cet6.Total:N0} 词"));
         Body.Children.Add(UI.Panel(info));
+        Body.Children.Add(BackupPanel());
         var about = UI.Column(5);
         about.Children.Add(UI.Text("关于 LexiPane", 16, true));
         var version = typeof(App).Assembly.GetName().Version!;
         about.Children.Add(UI.Secondary($"{version.ToString(3)} · Windows 原生离线词汇学习"));
         Body.Children.Add(UI.Panel(about));
+    }
+
+    private Border BackupPanel()
+    {
+        var panel = UI.Column(9);
+        panel.Children.Add(UI.Text("学习数据", 16, true));
+        panel.Children.Add(UI.Secondary(App.IsPackaged
+            ? "商店版使用独立存档。切换版本或卸载前可导出备份。"
+            : "可导出学习进度、笔记、收藏和设置，供另一版本恢复。"));
+        var status = UI.Secondary("");
+        var buttons = UI.Row();
+        var export = new Button { Content = "导出学习备份" };
+        var import = new Button { Content = "导入学习备份" };
+        buttons.Children.Add(export);
+        buttons.Children.Add(import);
+        panel.Children.Add(buttons);
+        panel.Children.Add(status);
+        async Task UseBackupPicker(Func<Task> action)
+        {
+            export.IsEnabled = import.IsEnabled = false;
+            try { await action(); }
+            catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException or
+                Microsoft.Data.Sqlite.SqliteException or System.Runtime.InteropServices.COMException)
+            {
+                status.Text = $"备份操作未完成。{e.Message}";
+            }
+            finally { export.IsEnabled = import.IsEnabled = true; }
+        }
+        export.Click += async (_, _) => await UseBackupPicker(async () =>
+        {
+            var picker = new Windows.Storage.Pickers.FileSavePicker { SuggestedFileName = $"LexiPane-{DateTime.Today:yyyy-MM-dd}" };
+            picker.FileTypeChoices.Add("LexiPane 学习备份", [".lexipane"]);
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+            var file = await picker.PickSaveFileAsync();
+            if (file is null || app.Exiting) return;
+            if (string.IsNullOrEmpty(file.Path)) throw new InvalidDataException("请选择一个可访问的本地保存位置。");
+            app.Store.ExportBackup(file.Path);
+            status.Text = "学习备份已保存。";
+        });
+        import.Click += async (_, _) => await UseBackupPicker(async () =>
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            foreach (string extension in new[] { ".lexipane", ".db", ".bak" }) picker.FileTypeFilter.Add(extension);
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+            var file = await picker.PickSingleFileAsync();
+            if (file is null || app.Exiting) return;
+            if (string.IsNullOrEmpty(file.Path)) throw new InvalidDataException("请将备份下载到本机后再打开。");
+            var confirm = new ContentDialog
+            {
+                XamlRoot = Nav.XamlRoot, Title = "导入并替换当前学习数据",
+                Content = "导入会替换本版的学习进度、笔记、收藏和设置。当前存档会自动备份。完成后程序将退出，请重新打开 LexiPane。",
+                PrimaryButtonText = "导入并退出", CloseButtonText = "取消", DefaultButton = ContentDialogButton.Close
+            };
+            if (await confirm.ShowAsync() != ContentDialogResult.Primary || app.Exiting) return;
+            app.Store.ImportBackup(file.Path);
+            app.Quit(saveWidgetBounds: false);
+        });
+        return UI.Panel(panel);
     }
 }

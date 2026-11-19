@@ -6,6 +6,7 @@ namespace Vocabulary.Core;
 public sealed partial class StudyStore : ILexicon, IPreferences, IDisposable
 {
     private readonly SqliteConnection db;
+    private readonly string databasePath;
     private readonly IReviewScheduler scheduler;
     public event Action<string, bool>? BookmarkChanged;
     public event Action<string>? NoteChanged;
@@ -15,7 +16,7 @@ public sealed partial class StudyStore : ILexicon, IPreferences, IDisposable
     {
         this.scheduler = scheduler ?? new Sm2Scheduler();
         Directory.CreateDirectory(dataRoot);
-        string file = Path.Combine(dataRoot, "study.db");
+        string file = databasePath = Path.GetFullPath(Path.Combine(dataRoot, "study.db"));
         db = new(new SqliteConnectionStringBuilder { DataSource = new Uri(Path.GetFullPath(file)).AbsoluteUri, Pooling = false }.ToString());
         db.Open();
         try
