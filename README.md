@@ -4,7 +4,11 @@ LexiPane 是一款 Windows 原生离线词汇学习应用，支持 Windows 11 x6
 
 ## 下载
 
-[在 Microsoft Store 获取](https://apps.microsoft.com/detail/9NFDCL5RBCRG?hl=zh-cn&gl=CN&ocid=pdpshare) · [下载 Windows 11 x64 免安装版](https://github.com/FFZFC/vocabulary/releases/download/v2.3.1/LexiPane-v2.3.1-windows-x64-portable.zip) · [版本说明与源码](https://github.com/FFZFC/vocabulary/releases/tag/v2.3.1)
+<a href="https://apps.microsoft.com/detail/9NFDCL5RBCRG?hl=zh-cn&amp;gl=CN&amp;ocid=pdpshare">
+  <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="200" alt="在 Microsoft Store 获取 LexiPane" />
+</a>
+
+[下载 Windows 11 x64 免安装版](https://github.com/FFZFC/vocabulary/releases/download/v2.3.1/LexiPane-v2.3.1-windows-x64-portable.zip) · [版本说明与源码](https://github.com/FFZFC/vocabulary/releases/tag/v2.3.1)
 
 ## 功能
 
